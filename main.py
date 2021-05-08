@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request, render_template, jsonify, flash, redirect, url_for
 import json
+from datetime import datetime
 from wtforms import Form, DateTimeField, IntegerField, BooleanField, StringField, PasswordField, validators
 
 class RegistrationForm(Form):
@@ -9,14 +10,31 @@ class RegistrationForm(Form):
     field = StringField('What Field do you Want', [validators.DataRequired()])
     people = IntegerField('How many people on the field', [validators.DataRequired()])
     startdatetime = DateTimeField('What time do you want the field', [validators.DataRequired()])
-    enddatatime = DateTimeField('What time will you be off the field', [validators.DataReuqired()])
+    enddatetime = DateTimeField('What time will you be off the field', [validators.DataRequired()])
     accept_tos = BooleanField('I accept the TOS', [validators.DataRequired()])
 
 class User():
-    def __init__(self, name, email, field):
-        print(name)
-        print(email)
-        print(field)
+    def __init__(self, name, email, field, people, startdatetime, enddatetime):
+        self.name = name
+        self.email = email
+        self.field = field
+        self.people = people
+        self.startdatetime = startdatetime
+        self.enddatetime = enddatetime
+
+    def dumpJson(self):
+        data = []
+        with open('events.json', "r") as json_file:
+            data = json.load(json_file)
+
+        data.append({
+            "title": self.field + "\n Name: " + self.name + "\n Email: " + self.email + "\n People: " + str(self.people),
+            "start": self.startdatetime.strftime("%m-%d-%Y %H:%M:%S+13:21"),
+            "end": self.enddatetime.strftime("%m-%d-%Y %H:%M:%S+13:21")
+        })
+
+        with open('events.json', 'w') as outfile:
+            json.dump(data, outfile)
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -45,8 +63,9 @@ def login():
 def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = User(form.name.data, form.email.data, form.field.data)
-        flash('Thanks for registering')
+        user = User(form.name.data, form.email.data, form.field.data, form.people.data, form.startdatetime.data, form.enddatetime.data)
+        user.dumpJson()
+        flash('Thanks for booking a field')
         return redirect('/login')
     return render_template('register.html', form=form)
 

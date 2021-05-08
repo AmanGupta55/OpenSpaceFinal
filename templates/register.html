@@ -8,9 +8,12 @@
     {% from "_formhelpers.html" import render_field %}
     <form method=post>
       <dl>
-        {{ render_field(form.username) }}
+        {{ render_field(form.name) }}
         {{ render_field(form.email) }}
-        {{ render_field(form.password) }}
+        {{ render_field(form.field) }}
+        {{ render_field(form.people) }}
+        {{ render_field(form.startdatetime) }}
+        {{ render_field(form.enddatetime) }}
         {{ render_field(form.accept_tos) }}
       </dl>
       <p><input type=submit value=Register>
