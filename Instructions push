@@ -1,4 +1,4 @@
-Setting it up first time
+  Setting it up first time
 git init
 git add .
 git commit -m "short message here"
